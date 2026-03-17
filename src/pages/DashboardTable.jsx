@@ -1,7 +1,7 @@
 import { ArrowDown, ArrowRight, MoreHorizontal } from "lucide-react";
 import "./DashboardTable.css";
 
-const DEFAULT_LABELS = {
+const defaultLabels = {
   article_no: "Article No.",
   product_service: "Product/Service",
   in_price: "In Price",
@@ -11,73 +11,35 @@ const DEFAULT_LABELS = {
   description: "Description",
 };
 
-const FAKE_ROWS = [
-  {
-    articleNo: "1234567890",
-    product: "This is a test product with fifty characters this!",
-    inPrice: "900500",
-    price: "1500800",
-    unit: "kilometers/hour",
-    inStock: "2500600",
-    description: "This is the description with fifty characters this",
-  },
-  {
-    articleNo: "1000000001",
-    product: "Premium subscription (monthly)",
-    inPrice: "0",
-    price: "199",
-    unit: "month",
-    inStock: "—",
-    description: "Access to all features for one month",
-  },
-  {
-    articleNo: "1000000002",
-    product: "Consulting (hourly)",
-    inPrice: "0",
-    price: "1250",
-    unit: "hour",
-    inStock: "—",
-    description: "Remote consulting billed per hour",
-  },
-  {
-    articleNo: "2000000042",
-    product: "Office chair, ergonomic",
-    inPrice: "950",
-    price: "1499",
-    unit: "pcs",
-    inStock: "18",
-    description: "Adjustable lumbar support and armrests",
-  },
-  {
-    articleNo: "3000123400",
-    product: "Shipping & handling",
-    inPrice: "0",
-    price: "89",
-    unit: "order",
-    inStock: "—",
-    description: "Standard delivery within 3–5 business days",
-  },
-  {
-    articleNo: "4000007777",
-    product: "Stainless steel water bottle 1L",
-    inPrice: "65",
-    price: "129",
-    unit: "pcs",
-    inStock: "240",
-    description: "Keeps drinks cold for up to 24 hours",
-  },
-];
+function DashboardTable({ labels = {}, rows = [], isLoading = false }) {
+  const t = { ...defaultLabels, ...labels };
 
-function DashboardTable({ labels = {} }) {
-  const t = { ...DEFAULT_LABELS, ...labels };
+  if (isLoading) {
+    return <div className="loadingState">Loading...</div>;
+  }
+
+  if (!rows?.length) {
+    return <div className="NO_DATA">No data</div>;
+  }
+
+  const data = rows.map((r) => ({
+    id: r.id,
+    articleNo: r.article_no,
+    product: r.product_service,
+    inPrice: r.in_price,
+    price: r.price,
+    unit: r.unit,
+    inStock: r.in_stock,
+    description: r.description,
+  }));
 
   return (
-    <div className="dashboard-table-wrap">
-      <table className="dashboard-table">
+    <div className="tblWrap">
+      <table className="tbl">
         <thead>
           <tr>
             <th>
-              <span className="dashboard-table-th-sortable dashboard-table-th-sortable-blue">
+              <span className="thSort thSortCyan">
                 {t.article_no}
                 <ArrowDown
                   className="dashboard-table-sort-icon is-cyan"
@@ -87,7 +49,7 @@ function DashboardTable({ labels = {} }) {
               </span>
             </th>
             <th>
-              <span className="dashboard-table-th-sortable dashboard-table-th-sortable-green">
+              <span className="thSort thSortGrn">
                 {t.product_service}
                 <ArrowDown
                   className="dashboard-table-sort-icon is-green"
@@ -105,39 +67,39 @@ function DashboardTable({ labels = {} }) {
           </tr>
         </thead>
         <tbody>
-          {FAKE_ROWS.map((r) => (
-            <tr key={r.articleNo}>
+          {data.map((r) => (
+            <tr key={r.id ?? r.articleNo}>
               <td>
-                <span className="dashboard-table-first-cell">
+                <span className="first_cell">
                   <ArrowRight
-                    className="dashboard-table-row-hover-arrow"
+                    className="ROW_ARROW"
                     size={18}
                     strokeWidth={2.5}
                   />
-                  <span className="dashboard-table-cell-pill">{r.articleNo}</span>
+                  <span className="cellP">{r.articleNo}</span>
                 </span>
               </td>
               <td>
-                <span className="dashboard-table-cell-pill">{r.product}</span>
+                <span className="cellP">{r.product}</span>
               </td>
               <td>
-                <span className="dashboard-table-cell-pill">{r.inPrice}</span>
+                <span className="cellP">{r.inPrice}</span>
               </td>
               <td>
-                <span className="dashboard-table-cell-pill">{r.price}</span>
+                <span className="cellP">{r.price}</span>
               </td>
               <td>
-                <span className="dashboard-table-cell-pill">{r.unit}</span>
+                <span className="cellP">{r.unit}</span>
               </td>
               <td>
-                <span className="dashboard-table-cell-pill">{r.inStock}</span>
+                <span className="cellP">{r.inStock}</span>
               </td>
               <td>
-                <span className="dashboard-table-cell-pill">
+                <span className="cellP">
                   {r.description}
                 </span>
               </td>
-              <td className="dashboard-table-cell-icon">
+              <td className="actIcon">
                 <MoreHorizontal size={18} strokeWidth={2.5} />
               </td>
             </tr>

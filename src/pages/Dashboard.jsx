@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Search, Plus, Printer, ToggleRight, Menu } from "lucide-react";
 import { getTranslations } from "../api/translations";
 import { getProfile } from "../api/auth";
+import { getProducts } from "../api/products";
 import { setToken } from "../api/token";
 import DashboardSidebar from "./DashboardSidebar";
 import DashboardTable from "./DashboardTable";
@@ -14,8 +15,8 @@ const LANG_TO_API_LOCALE = { en: "english", sv: "swedish" };
 
 function Dashboard() {
   const navigate = useNavigate();
-  const lang = localStorage.getItem(LOCALE_STORAGE_KEY) || "en";
-  const apiLocale = LANG_TO_API_LOCALE[lang] || "english";
+  const locale = localStorage.getItem(LOCALE_STORAGE_KEY) || "en";
+  const apiLocale = LANG_TO_API_LOCALE[locale] || "english";
 
   const { data: translations } = useQuery({
     queryKey: ["translations", apiLocale],
@@ -33,6 +34,14 @@ function Dashboard() {
   });
 
   const user = profile?.data?.user;
+
+  const page = 1;
+  const limit = 50;
+  const { data: products, isLoading: isProductsLoading } = useQuery({
+    queryKey: ["products", page, limit],
+    queryFn: () => getProducts({ page, limit }),
+    retry: false,
+  });
 
   useEffect(() => {
     const status = error?.response?.status;
@@ -61,15 +70,15 @@ function Dashboard() {
       <header className="dashboard-navbar">
         <button
           type="button"
-          className="dashboard-navbar-hamburger"
+          className="dashboard_navbar_hamburger"
           onClick={() => setSidebarOpen((o) => !o)}
           aria-label="Toggle menu"
           aria-expanded={sidebarOpen}
         >
           <Menu size={24} strokeWidth={2} />
         </button>
-        <div className="dashboard-navbar-user">
-          <div className="dashboard-navbar-avatar">
+        <div className="dash_usr">
+          <div className="Av">
             <svg
               width="24"
               height="24"
@@ -83,18 +92,18 @@ function Dashboard() {
             </svg>
           </div>
           <div>
-            <div className="dashboard-navbar-name">
+            <div className="userName">
               {user?.username ?? user?.email ?? "—"}
             </div>
-            <div className="dashboard-navbar-company">{user?.email ?? ""}</div>
+            <div className="dashboardNavbarCompany">{user?.email ?? ""}</div>
           </div>
         </div>
-        <div className="dashboard-navbar-right">
-          <div className="dashboard-navbar-lang">
-            {lang === "sv" ? "Svenska" : "English"}
+        <div className="RIGHT">
+          <div className="lang_selector">
+            {locale === "sv" ? "Svenska" : "English"}
             <img
               src={
-                lang === "sv"
+                locale === "sv"
                   ? "https://storage.123fakturere.no/public/flags/SE.png"
                   : "https://storage.123fakturere.no/public/flags/GB.png"
               }
@@ -103,7 +112,7 @@ function Dashboard() {
           </div>
           <button
             type="button"
-            className="dashboard-navbar-logout"
+            className="dashboardNavbarLogout"
             onClick={handleLogout}
           >
             Log out
@@ -118,46 +127,64 @@ function Dashboard() {
       />
 
       <main className="dashboard-main">
-        <div className="dashboard-toolbar">
-          <div className="dashboard-search-row">
-            <div className="dashboard-search-field">
+        <div className="dashboardToolbar">
+          <div className="dashboardSearchRow">
+            <div className="searchFld">
               <input
                 type="text"
                 placeholder={t.search_article_no ?? "Search Article No..."}
               />
-              <Search className="dashboard-search-icon" size={20} />
+              <Search className="search_icn" size={20} />
             </div>
-            <div className="dashboard-search-field">
+            <div className="searchFld">
               <input
                 type="text"
                 placeholder={t.search_product ?? "Search Product..."}
               />
-              <Search className="dashboard-search-icon" size={20} />
+              <Search className="search_icn" size={20} />
             </div>
           </div>
-          <div className="dashboard-actions">
-            <button type="button" className="dashboard-btn" title={t.new_product ?? "New Product"}>
-              <span className="dashboard-btn-text">{t.new_product ?? "New Product"}</span>
-              <span className="dashboard-btn-icon dashboard-btn-icon-green">
+          <div className="dashboard_actions">
+            <button
+              type="button"
+              className="btn"
+              title={t.new_product ?? "New Product"}
+            >
+              <span className="btnTxt">{t.new_product ?? "New Product"}</span>
+              <span className="btn_icn btn_icn_grn">
                 <Plus size={10} strokeWidth={2.5} />
               </span>
             </button>
-            <button type="button" className="dashboard-btn" title={t.print_list ?? "Print List"}>
-              <span className="dashboard-btn-text">{t.print_list ?? "Print List"}</span>
-              <span className="dashboard-btn-icon dashboard-btn-icon-blue">
+            <button
+              type="button"
+              className="btn"
+              title={t.print_list ?? "Print List"}
+            >
+              <span className="btnTxt">{t.print_list ?? "Print List"}</span>
+              <span className="btn_icn btn_icn_blu">
                 <Printer size={10} strokeWidth={2} />
               </span>
             </button>
-            <button type="button" className="dashboard-btn" title={t.advanced_mode ?? "Advanced mode"}>
-              <span className="dashboard-btn-text">{t.advanced_mode ?? "Advanced mode"}</span>
-              <span className="dashboard-btn-icon dashboard-btn-icon-blue">
+            <button
+              type="button"
+              className="btn"
+              title={t.advanced_mode ?? "Advanced mode"}
+            >
+              <span className="btnTxt">{t.advanced_mode ?? "Advanced mode"}</span>
+              <span className="btn_icn btn_icn_blu">
                 <ToggleRight size={10} strokeWidth={2} />
               </span>
             </button>
           </div>
         </div>
 
-        <DashboardTable labels={t} />
+        <div className="tbl_zone">
+          <DashboardTable
+            labels={t}
+            rows={products?.data?.items ?? []}
+            isLoading={isProductsLoading}
+          />
+        </div>
       </main>
     </div>
   );

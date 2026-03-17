@@ -1,10 +1,10 @@
 import axios from "axios";
 import { getToken } from "./token";
 
-const baseURL = (import.meta.env.VITE_API_URL || "http://localhost:3000/api").trim();
+const BASE = (import.meta.env.VITE_API_URL || "http://localhost:3000/api").trim();
 
 const api = axios.create({
-  baseURL,
+  baseURL: BASE,
   timeout: 10000,
   headers: { "Content-Type": "application/json" },
   withCredentials: true,
