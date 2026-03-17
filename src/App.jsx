@@ -4,6 +4,7 @@ import reactLogo from './assets/react.svg'
 import viteLogo from './assets/vite.svg'
 import heroImg from './assets/hero.png'
 import Login from './pages/Login'
+import Dashboard from './pages/Dashboard'
 import './App.css'
 
 function Home() {
@@ -127,6 +128,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/dashboard" element={<Dashboard />} />
       </Routes>
     </BrowserRouter>
   )

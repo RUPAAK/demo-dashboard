@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Eye, EyeOff } from "lucide-react";
 import { getTranslations } from "../api/translations";
 import { login as loginApi } from "../api/auth";
+import { setToken } from "../api/token";
 import "./login.css";
 
 const LOCALE_STORAGE_KEY = "app.locale";
@@ -24,6 +25,7 @@ const LANG_OPTIONS = [
 ];
 
 function Login() {
+  const navigate = useNavigate();
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
@@ -88,9 +90,22 @@ function Login() {
       return;
     }
 
-    loginApi(emailTrim, password).catch(() => {
-      setEmailError("validation_user_does_not_exist");
-    });
+    loginApi(emailTrim, password)
+      .then((res) => {
+        const data = res.data?.data ?? res.data;
+        const token =
+          data?.token ??
+          data?.accessToken ??
+          data?.access_token ??
+          res.data?.token ??
+          res.data?.accessToken ??
+          res.data?.access_token;
+        if (token) setToken(token);
+        navigate("/dashboard", { replace: true });
+      })
+      .catch(() => {
+        setEmailError("validation_user_does_not_exist");
+      });
   };
 
   return (
