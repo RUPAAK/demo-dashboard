@@ -6,6 +6,7 @@ import { getTranslations } from "../api/translations";
 import { getProfile } from "../api/auth";
 import { setToken } from "../api/token";
 import DashboardSidebar from "./DashboardSidebar";
+import DashboardTable from "./DashboardTable";
 import "./Dashboard.css";
 
 const LOCALE_STORAGE_KEY = "app.locale";
@@ -156,58 +157,7 @@ function Dashboard() {
           </div>
         </div>
 
-        <div className="dashboard-table-wrap">
-          <table className="dashboard-table">
-            <thead>
-              <tr>
-                <th></th>
-                <th>{t.article_no ?? "Article No."} ↓</th>
-                <th>{t.product_service ?? "Product/Service"} ↓</th>
-                <th>{t.in_price ?? "In Price"}</th>
-                <th>{t.price ?? "Price"}</th>
-                <th>{t.unit ?? "Unit"}</th>
-                <th>{t.in_stock ?? "In Stock"}</th>
-                <th>{t.description ?? "Description"}</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <polyline points="6 9 12 15 18 9" />
-                  </svg>
-                </td>
-                <td>1234567890</td>
-                <td>This is a test product with fifty characters this!</td>
-                <td>900500</td>
-                <td>1500800</td>
-                <td>kilometers/hour</td>
-                <td>2500600</td>
-                <td>This is the description with fifty characters this</td>
-                <td>
-                  <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                  >
-                    <circle cx="12" cy="5" r="1.5" />
-                    <circle cx="12" cy="12" r="1.5" />
-                    <circle cx="12" cy="19" r="1.5" />
-                  </svg>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <DashboardTable labels={t} />
       </main>
     </div>
   );

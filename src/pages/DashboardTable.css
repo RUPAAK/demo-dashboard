@@ -1,0 +1,130 @@
+.dashboard-table-wrap {
+  background: transparent;
+}
+
+.dashboard-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0.5rem 0.5rem;
+  font-size: 0.775rem;
+}
+
+.dashboard-table th {
+  text-align: left;
+  padding: 0 0 0.4rem;
+  background: transparent;
+  font-weight: 600;
+  color: #424242;
+  border: none;
+}
+
+.dashboard-table-th-sortable {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.dashboard-table-th-sortable-blue {
+  color: #424242;
+}
+
+.dashboard-table-th-sortable-green {
+  color: #424242;
+}
+
+.dashboard-table-sort-icon {
+  flex-shrink: 0;
+  transform: translateY(1px);
+}
+
+.dashboard-table-sort-icon.is-cyan {
+  color: #26c6da;
+}
+
+.dashboard-table-sort-icon.is-green {
+  color: #66bb6a;
+}
+
+.dashboard-table td {
+  padding: 0;
+  border: none;
+  color: #424242;
+  vertical-align: middle;
+}
+
+.dashboard-table-cell-pill {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.3rem 0.75rem;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 9999px;
+  font-size: inherit;
+  color: #424242;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dashboard-table-cell-icon {
+  width: 32px;
+  color: #9e9e9e;
+}
+
+.dashboard-table td:last-child.dashboard-table-cell-icon {
+  width: 40px;
+  text-align: right;
+}
+
+.dashboard-table-first-cell {
+  position: relative;
+  display: block;
+}
+
+.dashboard-table-row-hover-arrow {
+  position: absolute;
+  left: -26px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #26c6da;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.12s ease;
+}
+
+.dashboard-table tbody tr:hover .dashboard-table-row-hover-arrow {
+  opacity: 1;
+}
+
+.dashboard-table tbody tr:hover .dashboard-table-cell-pill {
+  border-color: #d0d0d0;
+  background: #fafafa;
+}
+
+/* Tablet: show only key columns (match reference) */
+@media (max-width: 1024px) {
+  /* Hide: In Price (3rd col) + Description (7th col) */
+  .dashboard-table th:nth-child(3),
+  .dashboard-table td:nth-child(3),
+  .dashboard-table th:nth-child(7),
+  .dashboard-table td:nth-child(7) {
+    display: none;
+  }
+}
+
+/* Mobile: show only Product/Service + Price + actions */
+@media (max-width: 768px) {
+  .dashboard-table th:nth-child(1),
+  .dashboard-table td:nth-child(1),
+  .dashboard-table th:nth-child(3),
+  .dashboard-table td:nth-child(3),
+  .dashboard-table th:nth-child(5),
+  .dashboard-table td:nth-child(5),
+  .dashboard-table th:nth-child(6),
+  .dashboard-table td:nth-child(6),
+  .dashboard-table th:nth-child(7),
+  .dashboard-table td:nth-child(7) {
+    display: none;
+  }
+}
