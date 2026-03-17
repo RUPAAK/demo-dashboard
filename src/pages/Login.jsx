@@ -1,13 +1,68 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { Eye, EyeOff } from "lucide-react";
+import api from "../api/axios";
+import { getTranslations } from "../api/translations";
 import "./login.css";
+
+const LOCALE_STORAGE_KEY = "app.locale";
+
+const LANG_TO_API_LOCALE = { en: "english", sv: "swedish" };
+
+const LANG_OPTIONS = [
+  {
+    id: "en",
+    label: "English",
+    flag: "https://storage.123fakturere.no/public/flags/GB.png",
+  },
+  {
+    id: "sv",
+    label: "Svenska",
+    flag: "https://storage.123fakturere.no/public/flags/SE.png",
+  },
+];
 
 function Login() {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [langOpen, setLangOpen] = useState(false);
+  const [lang, setLang] = useState(
+    () => localStorage.getItem(LOCALE_STORAGE_KEY) || "en",
+  );
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const apiLocale = LANG_TO_API_LOCALE[lang] || "english";
+
+  const { data: translations } = useQuery({
+    queryKey: ["translations", apiLocale],
+    queryFn: () => getTranslations(apiLocale),
+  });
+
+  useEffect(() => {
+    localStorage.setItem(LOCALE_STORAGE_KEY, lang);
+  }, [lang]);
 
   const closeMenu = () => setMenuOpen(false);
+  const currentLang =
+    LANG_OPTIONS.find((o) => o.id === lang) || LANG_OPTIONS[0];
 
+  const t = translations?.data || {};
+  const navLabel = (id) =>
+    id === "en" ? (t.nav?.english ?? "English") : (t.nav?.swedish ?? "Svenska");
+
+  const setLanguage = (id) => {
+    setLang(id);
+    setLangOpen(false);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    api.post("/login", { email, password }).catch(console.error);
+  };
+
+  console.log(t);
   return (
     <div className="login-page">
       <nav className="login-nav">
@@ -18,15 +73,42 @@ function Login() {
           />
         </div>
         <div className="login-nav-links">
-          <Link to="/">Home</Link>
-          <a href="#order">Order</a>
-          <a href="#customers">Our Customers</a>
-          <a href="#about">About us</a>
-          <a href="#contact">Contact Us</a>
-          <span className="login-nav-lang">
-            English
-            <img src="https://flagcdn.com/w40/gb.png" alt="" />
-          </span>
+          <Link to="/">{t.nav?.home ?? "Home"}</Link>
+          <a href="#order">{t.nav?.order ?? "Order"}</a>
+          <a href="#customers">{t.nav?.our_customers ?? "Our Customers"}</a>
+          <a href="#about">{t.nav?.about_us ?? "About us"}</a>
+          <a href="#contact">{t.nav?.contact_us ?? "Contact Us"}</a>
+          <div className="login-nav-lang-wrap">
+            <button
+              type="button"
+              className="login-nav-lang"
+              onClick={() => setLangOpen((o) => !o)}
+              aria-expanded={langOpen}
+              aria-haspopup="listbox"
+            >
+              {navLabel(lang)}
+              <img src={currentLang.flag} alt="" />
+            </button>
+            <div
+              className={`login-nav-lang-dropdown ${langOpen ? "is-open" : ""}`}
+              role="listbox"
+              aria-hidden={!langOpen}
+            >
+              {LANG_OPTIONS.map((opt) => (
+                <button
+                  key={opt.id}
+                  type="button"
+                  role="option"
+                  aria-selected={lang === opt.id}
+                  className="login-nav-lang-option"
+                  onClick={() => setLanguage(opt.id)}
+                >
+                  {navLabel(opt.id)}
+                  <img src={opt.flag} alt="" />
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
         <div className="login-nav-mobile">
           <div className="login-nav-mobile-left">
@@ -46,50 +128,85 @@ function Login() {
               aria-hidden={!menuOpen}
             >
               <Link to="/" onClick={closeMenu}>
-                Home
+                {t.nav?.home ?? "Home"}
               </Link>
               <a href="#order" onClick={closeMenu}>
-                Order
+                {t.nav?.order ?? "Order"}
               </a>
               <a href="#customers" onClick={closeMenu}>
-                Our Customers
+                {t.nav?.our_customers ?? "Our Customers"}
               </a>
               <a href="#about" onClick={closeMenu}>
-                About us
+                {t.nav?.about_us ?? "About us"}
               </a>
               <a href="#contact" onClick={closeMenu}>
-                Contact Us
+                {t.nav?.contact_us ?? "Contact Us"}
               </a>
             </div>
           </div>
-          <span className="login-nav-lang-mobile">
-            English
-            <img src="https://flagcdn.com/w40/gb.png" alt="" />
-          </span>
+          <div className="login-nav-lang-wrap">
+            <button
+              type="button"
+              className="login-nav-lang-mobile"
+              onClick={() => setLangOpen((o) => !o)}
+              aria-expanded={langOpen}
+              aria-haspopup="listbox"
+            >
+              {navLabel(lang)}
+              <img src={currentLang.flag} alt="" />
+            </button>
+            <div
+              className={`login-nav-lang-dropdown ${langOpen ? "is-open" : ""}`}
+              role="listbox"
+              aria-hidden={!langOpen}
+            >
+              {LANG_OPTIONS.map((opt) => (
+                <button
+                  key={opt.id}
+                  type="button"
+                  role="option"
+                  aria-selected={lang === opt.id}
+                  className="login-nav-lang-option"
+                  onClick={() => setLanguage(opt.id)}
+                >
+                  {navLabel(opt.id)}
+                  <img src={opt.flag} alt="" />
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
       </nav>
 
       <main className="login-main">
         <div className="login-card">
-          <h1>Log in</h1>
-          <form className="login-form" onSubmit={(e) => e.preventDefault()}>
+          <h1>{t.auth?.log_in ?? "Log in"}</h1>
+          <form className="login-form" onSubmit={handleSubmit}>
             <div className="field">
-              <label htmlFor="login-email">Enter your email address</label>
+              <label htmlFor="login-email">
+                {t.auth?.enter_your_email_address ?? "Enter your email address"}
+              </label>
               <input
                 id="login-email"
                 type="email"
-                placeholder="Email address"
+                placeholder={t.auth?.email_address ?? "Email address"}
                 autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
             </div>
             <div className="field">
-              <label htmlFor="login-password">Enter your password</label>
+              <label htmlFor="login-password">
+                {t.auth?.enter_your_password ?? "Enter your password"}
+              </label>
               <div className="login-password-wrap">
                 <input
                   id="login-password"
                   type={passwordVisible ? "text" : "password"}
-                  placeholder="Password"
+                  placeholder={t.auth?.password ?? "Password"}
                   autoComplete="current-password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                 />
                 <button
                   type="button"
@@ -99,40 +216,37 @@ function Login() {
                     passwordVisible ? "Hide password" : "Show password"
                   }
                 >
-                  {passwordVisible ? (
-                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.04 0-2.04.2-2.94.57l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z" />
-                    </svg>
-                  ) : (
-                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-2.73-4.39-7-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" />
-                    </svg>
-                  )}
+                  {passwordVisible ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
               </div>
             </div>
             <button type="submit" className="login-submit">
-              Log in
+              {t.auth?.log_in ?? "Log in"}
             </button>
           </form>
           <div className="login-card-links">
-            <Link to="/register">Register</Link>
-            <a href="#forgot">Forgotten password?</a>
+            <Link to="/register">{t.auth?.register ?? "Register"}</Link>
+            <a href="#forgot">
+              {t.auth?.forgotten_password ?? "Forgotten password?"}
+            </a>
           </div>
         </div>
       </main>
 
       <footer className="login-footer-bar">
         <div className="login-footer-bar-content">
-          <p className="login-footer-bar-brand">123 Fakturera</p>
+          <p className="login-footer-bar-brand">
+            {t.footer?.brand ?? "123 Fakturera"}
+          </p>
           <div className="login-footer-bar-links">
-            <Link to="/">Home</Link>
-            <a href="#order">Order</a>
-            <a href="#contact">Contact us</a>
+            <Link to="/">{t.footer?.home ?? "Home"}</Link>
+            <a href="#order">{t.footer?.order ?? "Order"}</a>
+            <a href="#contact">{t.footer?.contact_us ?? "Contact us"}</a>
           </div>
         </div>
         <p className="login-footer-bar-copyright">
-          © Lättfaktura, CRO no. 638537, 2025. All rights reserved.
+          {t.footer?.copyright ??
+            "© Lättfaktura, CRO no. 638537, 2025. All rights reserved."}
         </p>
       </footer>
     </div>

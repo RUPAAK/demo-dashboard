@@ -51,26 +51,6 @@
   position: relative;
 }
 
-.login-nav-lang-mobile {
-  display: none;
-  align-items: center;
-  gap: 0.4rem;
-  color: #fff;
-  font-size: 0.9375rem;
-  font-weight: 500;
-  font-family:
-    system-ui,
-    -apple-system,
-    sans-serif;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
-}
-
-.login-nav-lang-mobile img {
-  width: 20px;
-  height: 14px;
-  object-fit: cover;
-}
-
 .login-nav-hamburger {
   display: flex;
   flex-direction: column;
@@ -148,24 +128,81 @@
   color: #000;
 }
 
-.login-nav-lang {
+.login-nav-lang-wrap {
+  position: relative;
+}
+
+.login-nav-lang,
+.login-nav-lang-mobile {
   display: flex;
   align-items: center;
   gap: 0.4rem;
+  padding: 0;
+  border: none;
+  background: transparent;
   color: #fff;
   font-size: 0.9375rem;
   font-weight: 500;
-  font-family:
-    system-ui,
-    -apple-system,
-    sans-serif;
+  font-family: system-ui, -apple-system, sans-serif;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
 }
 
-.login-nav-lang img {
+.login-nav-lang img,
+.login-nav-lang-mobile img {
   width: 20px;
   height: 14px;
   object-fit: cover;
+}
+
+.login-nav-lang-mobile {
+  display: none;
+}
+
+.login-nav-lang-dropdown {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 6px;
+  min-width: 160px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+  padding: 0.5rem 0;
+  flex-direction: column;
+  z-index: 30;
+}
+
+.login-nav-lang-dropdown.is-open {
+  display: flex;
+}
+
+.login-nav-lang-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.5rem 1rem;
+  border: none;
+  background: transparent;
+  color: #000;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  font-family: system-ui, -apple-system, sans-serif;
+  text-align: left;
+  cursor: pointer;
+}
+
+.login-nav-lang-option:hover {
+  background: #f5f5f5;
+}
+
+.login-nav-lang-option img {
+  width: 24px;
+  height: 18px;
+  object-fit: cover;
+  margin-left: 0.5rem;
 }
 
 .login-main {
@@ -259,7 +296,7 @@
 .login-password-toggle svg {
   width: 20px;
   height: 20px;
-  fill: #616161;
+  color: #616161;
 }
 
 .login-submit {
