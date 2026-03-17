@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Eye, EyeOff } from "lucide-react";
-import api from "../api/axios";
 import { getTranslations } from "../api/translations";
+import { login as loginApi } from "../api/auth";
 import "./login.css";
 
 const LOCALE_STORAGE_KEY = "app.locale";
@@ -32,6 +32,8 @@ function Login() {
   );
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [emailError, setEmailError] = useState(null);
+  const [passwordError, setPasswordError] = useState(null);
 
   const apiLocale = LANG_TO_API_LOCALE[lang] || "english";
 
@@ -59,10 +61,38 @@ function Login() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    api.post("/login", { email, password }).catch(console.error);
+    setEmailError(null);
+    setPasswordError(null);
+
+    const emailTrim = email.trim();
+    const hasEmail = emailTrim.length > 0;
+    const emailValid =
+      /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailTrim);
+    const hasPassword = password.length > 0;
+    const passwordMin = password.length >= 4;
+
+    if (!hasEmail) {
+      setEmailError("validation_field_required");
+      return;
+    }
+    if (!emailValid) {
+      setEmailError("validation_email_invalid");
+      return;
+    }
+    if (!hasPassword) {
+      setPasswordError("validation_field_required");
+      return;
+    }
+    if (!passwordMin) {
+      setPasswordError("validation_password_min_length");
+      return;
+    }
+
+    loginApi(emailTrim, password).catch(() => {
+      setEmailError("validation_user_does_not_exist");
+    });
   };
 
-  console.log(t);
   return (
     <div className="login-page">
       <nav className="login-nav">
@@ -192,8 +222,17 @@ function Login() {
                 placeholder={t.auth?.email_address ?? "Email address"}
                 autoComplete="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  setEmailError(null);
+                }}
+                className={emailError ? "login-input-error" : ""}
               />
+              {emailError && (
+                <span className="login-form-error">
+                  {t.auth?.[emailError] ?? emailError}
+                </span>
+              )}
             </div>
             <div className="field">
               <label htmlFor="login-password">
@@ -206,7 +245,11 @@ function Login() {
                   placeholder={t.auth?.password ?? "Password"}
                   autoComplete="current-password"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    setPasswordError(null);
+                  }}
+                  className={passwordError ? "login-input-error" : ""}
                 />
                 <button
                   type="button"
@@ -219,6 +262,11 @@ function Login() {
                   {passwordVisible ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
               </div>
+              {passwordError && (
+                <span className="login-form-error">
+                  {t.auth?.[passwordError] ?? passwordError}
+                </span>
+              )}
             </div>
             <button type="submit" className="login-submit">
               {t.auth?.log_in ?? "Log in"}

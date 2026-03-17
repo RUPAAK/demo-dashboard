@@ -264,6 +264,17 @@
   border-color: #5a9fd4;
 }
 
+.login-form input.login-input-error {
+  border-color: #e53935;
+}
+
+.login-form-error {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.875rem;
+  color: #e53935;
+}
+
 .login-password-wrap {
   position: relative;
 }
