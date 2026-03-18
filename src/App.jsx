@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, Link } from "react-router-dom";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import PriceList from "./pages/PriceList";
@@ -14,7 +14,24 @@ function Home() {
         height: "100vh",
       }}
     >
-      <h1>Assignment website</h1>
+      <div style={{ textAlign: "center" }}>
+        <h1>Assignment website</h1>
+        <Link
+          to="/login"
+          style={{
+            marginTop: "1rem",
+            display: "inline-block",
+            padding: "0.5rem 1.5rem",
+            background: "#26c6da",
+            color: "#fff",
+            borderRadius: "9999px",
+            textDecoration: "none",
+            fontWeight: 500,
+          }}
+        >
+          Login
+        </Link>
+      </div>
     </div>
   );
 }
