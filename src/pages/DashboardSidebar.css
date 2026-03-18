@@ -93,8 +93,8 @@
 
 .dashboard-sidebar-dot,
 .dot {
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   background: #4caf50;
   flex-shrink: 0;
@@ -117,7 +117,10 @@
   color: #424242;
   text-decoration: none;
   font-size: 0.9375rem;
-  font-family: system-ui, -apple-system, sans-serif;
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
 }
 .navItem:hover,
 .dashboard-sidebar-item:hover {
@@ -171,4 +174,25 @@
   .dashboard-sidebar[data-overlay="true"].is-open {
     transform: translateX(0);
   }
+}
+
+.tag_icon_css {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid currentColor;
+  border-radius: 2px 2px 2px 0;
+  transform: rotate(-45deg);
+  position: relative;
+}
+
+.tag_icon_css::before {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: currentColor;
 }

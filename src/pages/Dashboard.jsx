@@ -97,6 +97,7 @@ function Dashboard() {
 
   const navT = translations?.data?.nav ?? {};
   const t = translations?.data?.dashboard ?? {};
+  const sidebarT = translations?.data?.sidebar ?? {};
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
@@ -186,7 +187,7 @@ function Dashboard() {
       </header>
 
       <DashboardSidebar
-        priceListLabel={t.price_list ?? "Price List"}
+        labels={sidebarT}
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
       />
