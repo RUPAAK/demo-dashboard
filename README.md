@@ -23,7 +23,7 @@ A product price list dashboard built with React and Vite.
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/your-username/dashboard.git
+git clone https://github.com/RUPAAK/demo-dashboard.git
 cd dashboard
 ```
 
