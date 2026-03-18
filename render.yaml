@@ -1,9 +1,9 @@
 services:
   - type: web
-    name: dashboard
+    name: assignment-website
     env: static
-    buildCommand: npm install && npm run build
-    staticPublishPath: ./dist
+    buildCommand: npm run build
+    staticPublishPath: dist
     routes:
       - type: rewrite
         source: /*
