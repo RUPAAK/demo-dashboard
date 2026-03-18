@@ -1,10 +1,11 @@
 import { useState } from 'react'
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Link, Navigate } from 'react-router-dom'
 import reactLogo from './assets/react.svg'
 import viteLogo from './assets/vite.svg'
 import heroImg from './assets/hero.png'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
+import PriceList from './pages/PriceList'
 import './App.css'
 
 function Home() {
@@ -128,7 +129,8 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/dashboard" element={<Navigate to="/price-list" replace />} />
+        <Route path="/price-list" element={<PriceList />} />
       </Routes>
     </BrowserRouter>
   )

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Eye, EyeOff } from "lucide-react";
 import { getTranslations } from "../api/translations";
 import { login as loginApi } from "../api/auth";
@@ -61,6 +61,25 @@ function Login() {
     setLangOpen(false);
   };
 
+  const loginMutation = useMutation({
+    mutationFn: ({ email, password }) => loginApi(email, password),
+    onSuccess: (res) => {
+      const data = res.data?.data ?? res.data;
+      const token =
+        data?.token ??
+        data?.accessToken ??
+        data?.access_token ??
+        res.data?.token ??
+        res.data?.accessToken ??
+        res.data?.access_token;
+      if (token) setToken(token);
+      navigate("/price-list", { replace: true });
+    },
+    onError: () => {
+      setEmailError("validation_user_does_not_exist");
+    },
+  });
+
   const handleSubmit = (e) => {
     e.preventDefault();
     setEmailError(null);
@@ -68,8 +87,7 @@ function Login() {
 
     const emailTrim = email.trim();
     const hasEmail = emailTrim.length > 0;
-    const emailValid =
-      /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailTrim);
+    const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailTrim);
     const hasPassword = password.length > 0;
     const passwordMin = password.length >= 4;
 
@@ -90,22 +108,7 @@ function Login() {
       return;
     }
 
-    loginApi(emailTrim, password)
-      .then((res) => {
-        const data = res.data?.data ?? res.data;
-        const token =
-          data?.token ??
-          data?.accessToken ??
-          data?.access_token ??
-          res.data?.token ??
-          res.data?.accessToken ??
-          res.data?.access_token;
-        if (token) setToken(token);
-        navigate("/dashboard", { replace: true });
-      })
-      .catch(() => {
-        setEmailError("validation_user_does_not_exist");
-      });
+    loginMutation.mutate({ email: emailTrim, password });
   };
 
   return (
@@ -283,8 +286,14 @@ function Login() {
                 </span>
               )}
             </div>
-            <button type="submit" className="login-submit">
-              {t.auth?.log_in ?? "Log in"}
+            <button
+              type="submit"
+              className="login-submit"
+              disabled={loginMutation.isPending}
+            >
+              {loginMutation.isPending
+                ? (t.auth?.loading ?? "Loading...")
+                : (t.auth?.log_in ?? "Log in")}
             </button>
           </form>
           <div className="login-card-links">

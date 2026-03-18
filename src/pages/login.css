@@ -324,6 +324,11 @@
   margin-bottom: 1.25rem;
 }
 
+.login-submit:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
 .login-submit:hover {
   background: #43a047;
 }

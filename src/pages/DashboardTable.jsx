@@ -1,4 +1,4 @@
-import { ArrowDown, ArrowRight, MoreHorizontal } from "lucide-react";
+import { ArrowDown, ArrowRight, MoreHorizontal, Loader2 } from "lucide-react";
 import "./DashboardTable.css";
 
 const defaultLabels = {
@@ -11,7 +11,7 @@ const defaultLabels = {
   description: "Description",
 };
 
-function DashboardTable({ labels = {}, rows = [], isLoading = false }) {
+function DashboardTable({ labels = {}, rows = [], isLoading = false, onUpdate, updatingRowId }) {
   const t = { ...defaultLabels, ...labels };
 
   if (isLoading) {
@@ -67,43 +67,95 @@ function DashboardTable({ labels = {}, rows = [], isLoading = false }) {
           </tr>
         </thead>
         <tbody>
-          {data.map((r) => (
-            <tr key={r.id ?? r.articleNo}>
-              <td>
-                <span className="first_cell">
-                  <ArrowRight
-                    className="ROW_ARROW"
-                    size={18}
-                    strokeWidth={2.5}
+          {data.map((r) => {
+            const isUpdating = updatingRowId === r.id;
+
+            const handleBlur = (column, original) => (e) => {
+              const raw = e.target.value;
+              const value = e.target.type === "number" ? Number(raw) : raw;
+              if (value === original) return;
+              onUpdate?.(r.id, column, value);
+            };
+
+            return (
+              <tr
+                key={r.id ?? r.articleNo}
+                className={isUpdating ? "rowUpdating" : ""}
+              >
+                <td>
+                  <span className="first_cell">
+                    <ArrowRight
+                      className="ROW_ARROW"
+                      size={18}
+                      strokeWidth={2.5}
+                    />
+                    <span className="cellP">{r.articleNo}</span>
+                  </span>
+                </td>
+                <td>
+                  <input
+                    type="text"
+                    className="cellP cellInput"
+                    defaultValue={r.product}
+                    onBlur={handleBlur("product_service", r.product)}
+                    disabled={isUpdating}
                   />
-                  <span className="cellP">{r.articleNo}</span>
-                </span>
-              </td>
-              <td>
-                <span className="cellP">{r.product}</span>
-              </td>
-              <td>
-                <span className="cellP">{r.inPrice}</span>
-              </td>
-              <td>
-                <span className="cellP">{r.price}</span>
-              </td>
-              <td>
-                <span className="cellP">{r.unit}</span>
-              </td>
-              <td>
-                <span className="cellP">{r.inStock}</span>
-              </td>
-              <td>
-                <span className="cellP">
-                  {r.description}
-                </span>
-              </td>
-              <td className="actIcon">
-                <MoreHorizontal size={18} strokeWidth={2.5} />
-              </td>
-            </tr>
-          ))}
+                </td>
+                <td>
+                  <input
+                    type="number"
+                    className="cellP cellInput"
+                    defaultValue={r.inPrice}
+                    onBlur={handleBlur("in_price", Number(r.inPrice))}
+                    disabled={isUpdating}
+                  />
+                </td>
+                <td>
+                  <input
+                    type="number"
+                    className="cellP cellInput"
+                    defaultValue={r.price}
+                    onBlur={handleBlur("price", Number(r.price))}
+                    disabled={isUpdating}
+                  />
+                </td>
+                <td>
+                  <input
+                    type="text"
+                    className="cellP cellInput"
+                    defaultValue={r.unit}
+                    onBlur={handleBlur("unit", r.unit)}
+                    disabled={isUpdating}
+                  />
+                </td>
+                <td>
+                  <input
+                    type="number"
+                    className="cellP cellInput"
+                    defaultValue={r.inStock}
+                    onBlur={handleBlur("in_stock", Number(r.inStock))}
+                    disabled={isUpdating}
+                  />
+                </td>
+                <td>
+                  <input
+                    type="text"
+                    className="cellP cellInput"
+                    defaultValue={r.description}
+                    onBlur={handleBlur("description", r.description)}
+                    disabled={isUpdating}
+                  />
+                </td>
+                <td className="actIcon">
+                  {isUpdating ? (
+                    <Loader2 className="rowSpinner" size={18} strokeWidth={2.5} />
+                  ) : (
+                    <MoreHorizontal size={18} strokeWidth={2.5} />
+                  )}
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>

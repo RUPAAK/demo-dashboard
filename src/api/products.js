@@ -6,3 +6,7 @@ export function getProducts(opts = {}) {
   return api.get("/products", { params: { page: pg, limit: lim } }).then((r) => r.data);
 }
 
+export function updateProduct(id, key, value) {
+  return api.patch(`/products/${id}`, { key, value }).then((r) => r.data);
+}
+

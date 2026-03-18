@@ -1,21 +1,36 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Search, Plus, Printer, ToggleRight, Menu } from "lucide-react";
+import Avatar from "react-avatar";
 import { getTranslations } from "../api/translations";
 import { getProfile } from "../api/auth";
-import { getProducts } from "../api/products";
-import { setToken } from "../api/token";
+import { getProducts, updateProduct } from "../api/products";
 import DashboardSidebar from "./DashboardSidebar";
 import DashboardTable from "./DashboardTable";
 import "./Dashboard.css";
 
 const LOCALE_STORAGE_KEY = "app.locale";
 const LANG_TO_API_LOCALE = { en: "english", sv: "swedish" };
+const LANG_OPTIONS = [
+  {
+    id: "en",
+    label: "English",
+    flag: "https://storage.123fakturere.no/public/flags/GB.png",
+  },
+  {
+    id: "sv",
+    label: "Svenska",
+    flag: "https://storage.123fakturere.no/public/flags/SE.png",
+  },
+];
 
 function Dashboard() {
   const navigate = useNavigate();
-  const locale = localStorage.getItem(LOCALE_STORAGE_KEY) || "en";
+  const queryClient = useQueryClient();
+  const [locale, setLocale] = useState(
+    () => localStorage.getItem(LOCALE_STORAGE_KEY) || "en",
+  );
   const apiLocale = LANG_TO_API_LOCALE[locale] || "english";
 
   const { data: translations } = useQuery({
@@ -43,6 +58,36 @@ function Dashboard() {
     retry: false,
   });
 
+  const [updatingRowId, setUpdatingRowId] = useState(null);
+  const [snackbar, setSnackbar] = useState(null);
+
+  const { mutate: patchProduct } = useMutation({
+    mutationFn: ({ id, key, value }) => updateProduct(id, key, value),
+    onMutate: ({ id }) => {
+      setUpdatingRowId(id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      setSnackbar({ type: "success", message: "Product updated successfully" });
+    },
+    onError: () => {
+      setSnackbar({ type: "error", message: "Failed to update product" });
+    },
+    onSettled: () => {
+      setUpdatingRowId(null);
+    },
+  });
+
+  useEffect(() => {
+    if (!snackbar) return;
+    const timer = setTimeout(() => setSnackbar(null), 3000);
+    return () => clearTimeout(timer);
+  }, [snackbar]);
+
+  const handleProductUpdate = (id, key, value) => {
+    patchProduct({ id, key, value });
+  };
+
   useEffect(() => {
     const status = error?.response?.status;
     if (isError && (status === 401 || status === 403)) {
@@ -50,13 +95,25 @@ function Dashboard() {
     }
   }, [isError, error, navigate]);
 
+  const navT = translations?.data?.nav ?? {};
   const t = translations?.data?.dashboard ?? {};
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [langOpen, setLangOpen] = useState(false);
 
-  const handleLogout = () => {
-    setToken(null);
-    navigate("/login", { replace: true });
+  useEffect(() => {
+    localStorage.setItem(LOCALE_STORAGE_KEY, locale);
+  }, [locale]);
+
+  const navLabel = (id) =>
+    id === "en" ? (navT.english ?? "English") : (navT.swedish ?? "Svenska");
+
+  const currentLang =
+    LANG_OPTIONS.find((o) => o.id === locale) || LANG_OPTIONS[0];
+
+  const setLanguage = (id) => {
+    setLocale(id);
+    setLangOpen(false);
   };
 
   const authError =
@@ -79,17 +136,12 @@ function Dashboard() {
         </button>
         <div className="dash_usr">
           <div className="Av">
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-              <circle cx="12" cy="7" r="4" />
-            </svg>
+            <Avatar
+              name={user?.username ?? user?.email ?? ""}
+              size="40"
+              round
+              maxInitials={2}
+            />
           </div>
           <div>
             <div className="userName">
@@ -99,24 +151,37 @@ function Dashboard() {
           </div>
         </div>
         <div className="RIGHT">
-          <div className="lang_selector">
-            {locale === "sv" ? "Svenska" : "English"}
-            <img
-              src={
-                locale === "sv"
-                  ? "https://storage.123fakturere.no/public/flags/SE.png"
-                  : "https://storage.123fakturere.no/public/flags/GB.png"
-              }
-              alt=""
-            />
+          <div className="langWrap">
+            <button
+              type="button"
+              className="lang_selector"
+              onClick={() => setLangOpen((o) => !o)}
+              aria-expanded={langOpen}
+              aria-haspopup="listbox"
+            >
+              {navLabel(locale)}
+              <img src={currentLang.flag} alt="" />
+            </button>
+            <div
+              className={`langDrop ${langOpen ? "is-open" : ""}`}
+              role="listbox"
+              aria-hidden={!langOpen}
+            >
+              {LANG_OPTIONS.map((opt) => (
+                <button
+                  key={opt.id}
+                  type="button"
+                  role="option"
+                  aria-selected={locale === opt.id}
+                  className="langOpt"
+                  onClick={() => setLanguage(opt.id)}
+                >
+                  {navLabel(opt.id)}
+                  <img src={opt.flag} alt="" />
+                </button>
+              ))}
+            </div>
           </div>
-          <button
-            type="button"
-            className="dashboardNavbarLogout"
-            onClick={handleLogout}
-          >
-            Log out
-          </button>
         </div>
       </header>
 
@@ -170,7 +235,9 @@ function Dashboard() {
               className="btn"
               title={t.advanced_mode ?? "Advanced mode"}
             >
-              <span className="btnTxt">{t.advanced_mode ?? "Advanced mode"}</span>
+              <span className="btnTxt">
+                {t.advanced_mode ?? "Advanced mode"}
+              </span>
               <span className="btn_icn btn_icn_blu">
                 <ToggleRight size={10} strokeWidth={2} />
               </span>
@@ -183,9 +250,16 @@ function Dashboard() {
             labels={t}
             rows={products?.data?.items ?? []}
             isLoading={isProductsLoading}
+            onUpdate={handleProductUpdate}
+            updatingRowId={updatingRowId}
           />
         </div>
       </main>
+      {snackbar && (
+        <div className={`snackbar snackbar--${snackbar.type}`}>
+          {snackbar.message}
+        </div>
+      )}
     </div>
   );
 }
