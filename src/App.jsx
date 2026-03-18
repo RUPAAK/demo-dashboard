@@ -47,6 +47,7 @@ function App() {
           element={<Navigate to="/price-list" replace />}
         />
         <Route path="/price-list" element={<PriceList />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   );
