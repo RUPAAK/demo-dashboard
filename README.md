@@ -1,16 +1,62 @@
-# React + Vite
+# Dashboard
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A product price list dashboard built with React and Vite.
 
-Currently, two official plugins are available:
+## Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+| Technology | Version |
+|---|---|
+| React | ^19.2.4 |
+| React DOM | ^19.2.4 |
+| React Router DOM | ^7.13.1 |
+| React Query (@tanstack/react-query) | ^5.90.21 |
+| Axios | ^1.13.6 |
+| Lucide React | ^0.577.0 |
+| React Avatar | ^5.0.4 |
+| Vite | ^8.0.0 |
+| ESLint | ^9.39.4 |
+| JavaScript | ES Modules |
+| CSS | Plain CSS |
 
-## React Compiler
+## Getting Started
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### 1. Clone the repository
 
-## Expanding the ESLint configuration
+```bash
+git clone https://github.com/your-username/dashboard.git
+cd dashboard
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### 2. Install dependencies
+
+```bash
+npm install
+```
+
+### 3. Set up environment variables
+
+Create a `.env` file in the project root:
+
+```bash
+VITE_API_URL=http://localhost:3000/api
+```
+
+Replace the URL with your actual API endpoint.
+
+### 4. Run the development server
+
+```bash
+npm run dev
+```
+
+### 5. Build for production
+
+```bash
+npm run build
+```
+
+### 6. Preview the production build
+
+```bash
+npm run preview
+```
